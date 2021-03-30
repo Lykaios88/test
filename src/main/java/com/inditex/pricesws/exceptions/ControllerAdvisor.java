@@ -33,7 +33,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NoDataFoundException.class)
     public ResponseEntity<Object> handleNoDataFoundException( NoDataFoundException ex, WebRequest request) {
-        if (loggerController.isDebugEnabled()) {
+        if (loggerController.isErrorEnabled()) {
             loggerController.error(String.format("handleNoDataFoundException request: %s error %S", request.toString(), ExceptionUtils.getStackTrace(ex)));
         }
 
@@ -53,7 +53,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> globalHandlerException( Exception ex, WebRequest request) {
-        if (loggerController.isDebugEnabled()) {
+        if (loggerController.isErrorEnabled()) {
             loggerController.error(String.format("handleException request: %s error %S", request.toString(), ExceptionUtils.getStackTrace(ex)));
         }
 
@@ -65,7 +65,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid( MethodArgumentNotValidException ex,
                                                                    HttpHeaders headers, HttpStatus status,
                                                                    WebRequest request) {
-        if (loggerController.isDebugEnabled()) {
+        if (loggerController.isErrorEnabled()) {
             loggerController.error(String.format("handleMethodArgumentNotValid request: %s error %S", request.toString(), ex), Level.ERROR);
         }
 

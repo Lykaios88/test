@@ -1,6 +1,8 @@
 package com.inditex.pricesws.models.entities;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,43 +11,42 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
-@EqualsAndHashCode
 @Entity
 @Table(name="PRICES")
+@DynamicInsert
+@DynamicUpdate
 public class PriceEntity {
 
-    @Getter @Setter
+    @NonNull
     @Column(name="BRAND_ID")
-    private int brandId;
+    private Integer brandId;
 
-    @Getter @Setter
+    @NonNull
     @Column(name = "START_DATE")
     private LocalDateTime startDate;
 
-    @Getter @Setter
+    @NonNull
     @Column(name = "END_DATE")
     private LocalDateTime endDate;
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    @Getter @Setter
     @Column(name="PRICE_LIST")
-    private int priceList;
+    private Integer priceList;
 
-    @Getter @Setter
+    @NonNull
     @Column(name="PRODUCT_ID")
-    private int productId;
+    private Integer productId;
 
-    @Getter @Setter
+    @NonNull
     @Column(name="PRIORITY")
-    private int priority;
+    private Integer priority;
 
-    @Getter @Setter
+    @NonNull
     @Column(name="PRICE")
-    private double price;
+    private Double price;
 
-    @Getter @Setter
+    @NonNull
     @Column(name="CURR")
     private String currency;
 }

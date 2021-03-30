@@ -1,6 +1,6 @@
 package com.inditex.pricesws.controllers;
 
-import com.inditex.pricesws.dtos.Price;
+import com.inditex.pricesws.dtos.PriceDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,20 +12,20 @@ import java.util.List;
 public interface PriceController {
 
     @ApiOperation(value = "Retrieves a list of all price records")
-    ResponseEntity<List<Price>> getPrices ();
+    ResponseEntity<List<PriceDto>> getPrices ();
 
     @ApiOperation(value = "Retrieves a price record by id")
-    ResponseEntity<Price> getPriceById (Integer priceListId);
+    ResponseEntity<PriceDto> getPriceById (Integer priceListId);
     
     @ApiOperation(value = "Delete a price record by id")
     ResponseEntity<Void> deletePriceById (Integer priceListId);
 
     @ApiOperation(value = "Save a price record")
-    ResponseEntity<Price> updateOrSave(Price priceRequest);
+    ResponseEntity<PriceDto> updateOrSave(PriceDto priceDtoRequest);
 
     @ApiOperation(value = "Retrieves a list of all prices by product id")
-    ResponseEntity<List<Price>> getPricesByProductId (Integer productId);
+    ResponseEntity<List<PriceDto>> getPricesByProductId (Integer productId);
 
     @ApiOperation(value = "Retrieves a price by brand, product and date")
-    ResponseEntity<Price> getByBrandProductAndDate (Integer brandId, Integer productId, LocalDateTime startDate);
+    ResponseEntity<PriceDto> getByBrandProductAndDate (Integer brandId, Integer productId, LocalDateTime startDate);
 }

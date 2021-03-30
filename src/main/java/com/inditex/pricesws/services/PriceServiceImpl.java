@@ -1,103 +1,81 @@
 package com.inditex.pricesws.services;
 
-import com.inditex.pricesws.dtos.Price;
-import com.inditex.pricesws.dtos.Price;
-import com.inditex.pricesws.exceptions.NotFoundException;
+import com.inditex.pricesws.exceptions.InternalServerErrorException;
+import com.inditex.pricesws.exceptions.NoDataFoundException;
 import com.inditex.pricesws.models.entities.PriceEntity;
 import com.inditex.pricesws.models.repositories.PriceRepository;
-import org.dozer.Mapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class PriceServiceImpl implements PriceService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PriceServiceImpl.class);
+    private static final String PRICES_NOT_FOUND = "PRICES_NOT_FOUND ";
+    private static final String PRICE_NOT_FOUND_BY_PRICE_ID = "PRICES_NOT_FOUND_BY_PRICE_ID ";
+    private static final String PRICE_NOT_FOUND_BY_PRICE_ID_TO_DELETE = "PRICE_NOT_FOUND_BY_PRICE_ID_TO_DELETE ";
+    private static final String PRICES_NOT_FOUND_BY_PRODUCT_ID = "PRICES_NOT_FOUND_BY_PRODUCT_ID ";
+    private static final String PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE = "PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE ";
+    private static final String DELETE_PRICE_ERROR = "DELETE_PRICE_ERROR ";
+    private static final String SAVE_PRICE_ERROR = "SAVE_PRICE_ERROR ";
 
     @Autowired
     PriceRepository priceRepository;
 
-    @Autowired
-    Mapper mapper;
-
     @Override
-    public List<Price> getPrices() {
-        return mapEntityToDTO(priceRepository.findAll());
+    public List<PriceEntity> getPrices() {
+        return Optional.of(priceRepository.findAll())
+                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND));
     }
 
     @Override
-    public Price getPriceById(Integer priceListId){
-        return mapEntityToDTO(priceRepository.findByPriceList(priceListId));
+    public PriceEntity getPriceById(Integer priceListId){
+        return priceRepository.findByPriceList(priceListId)
+                .orElseThrow(() -> new NoDataFoundException(PRICE_NOT_FOUND_BY_PRICE_ID + priceListId));
     }
 
     @Override
-    public Price updateOrSavePrice(Price priceRequest) {
-        return mapEntityToDTO(priceRepository.saveAndFlush(mapDTOToEntity(priceRequest)));
+    public PriceEntity updateOrSavePrice(@RequestBody @Valid PriceEntity priceRequest) {
+        return Optional.of(priceRepository.saveAndFlush(priceRequest)).orElseThrow(() -> new InternalServerErrorException(SAVE_PRICE_ERROR));
     }
 
     @Override
-    public void deletePricebyId(Integer priceListId) {
-        priceRepository.deleteByPriceList(priceListId);
-    }
+    public Integer deletePriceById(Integer priceListId) {
+        var result = priceRepository.deleteByPriceList(priceListId)
+                .orElseThrow(() -> new InternalServerErrorException(DELETE_PRICE_ERROR + priceListId ));
 
-    @Override
-    public List<Price> getPricesByProductId(Integer productId) {
-        return mapEntityToDTO(priceRepository.findAllByProductIdOrderByPriorityDesc(productId));
-    }
-
-    @Override
-    public List<Price> findByBrandProductDate(Integer brandId, Integer productId, LocalDateTime date) {
-        return mapEntityToDTO(priceRepository.findByBrandIdAndProductIdAndStartDateBeforeAndEndDateAfterOrderByPriorityDesc(brandId, productId, date, date));
-    }
-
-    @Override
-    public Price findFirstByBrandProductDate(Integer brandId, Integer productId, LocalDateTime date) {
-        List<Price> Price = mapEntityToDTO(priceRepository.findByBrandIdAndProductIdAndStartDateBeforeAndEndDateAfterOrderByPriorityDesc(brandId, productId, date, date));
-        return Price != null ? Price.get(0) : null;
-    }
-
-    private Price mapEntityToDTO(PriceEntity priceEntity) {
-        // Map entity -> responseDTO
-        Price Price = null;
-        if (priceEntity != null) {
-            try {
-                Price = mapper.map(priceEntity, Price.class);
-            } catch (Exception e) {
-                LOGGER.error("MapperError", e);
-            }
+        if (result == 0){
+            throw new NoDataFoundException(PRICE_NOT_FOUND_BY_PRICE_ID_TO_DELETE + priceListId);
         }
-        return Price;
+        return result;
     }
 
-    private List<Price> mapEntityToDTO(List<PriceEntity> priceEntity) {
-        List<Price> response = new ArrayList<>();
-        try {
-            // Map entity -> responseDTO
-            priceEntity.forEach(p -> response.add(mapper.map(p, Price.class)));
-        } catch (Exception e) {
-            LOGGER.error("MapperError", e);
-        }
-        return response;
+    @Override
+    public List<PriceEntity> getPricesByProductId(Integer productId) {
+        return priceRepository.findAllByProductIdOrderByPriorityDesc(productId)
+                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND_BY_PRODUCT_ID + productId));
     }
 
-    private PriceEntity mapDTOToEntity(Price priceRequest) {
-        // Map requestDTO -> entity
-        PriceEntity priceEntity = null;
-        if (priceRequest != null) {
-            try {
-                priceEntity = mapper.map(priceRequest, PriceEntity.class);
-            } catch (Exception e) {
-                LOGGER.error("MapperError", e);
-            }
-        }
-        return priceEntity;
+    @Override
+    public List<PriceEntity> findByBrandProductDate(Integer brandId, Integer productId, LocalDateTime date) {
+        return priceRepository.findByBrandProductAndDatePriorityDesc(brandId, productId, date)
+                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date));
+    }
+
+    @Override
+    public PriceEntity findFirstByBrandProductDate(Integer brandId, Integer productId, LocalDateTime date) {
+        var price = priceRepository.findByBrandProductAndDatePriorityDesc(brandId, productId, date)
+                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date));
+        if (price.isEmpty()){
+            throw new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date);
+    }
+        return price.get(0);
     }
 }

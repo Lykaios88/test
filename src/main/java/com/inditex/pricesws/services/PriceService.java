@@ -1,23 +1,23 @@
 package com.inditex.pricesws.services;
 
-import com.inditex.pricesws.dtos.Price;
+import com.inditex.pricesws.models.entities.PriceEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PriceService {
 
-    List<Price> getPrices();
+    List<PriceEntity> getPrices();
 
-    Price getPriceById(Integer priceListId);
+    PriceEntity getPriceById(Integer priceListId);
 
-    Price updateOrSavePrice(Price priceRequest);
+    PriceEntity updateOrSavePrice(PriceEntity priceRequest);
 
-    void deletePricebyId(Integer priceListId);
+    Integer deletePriceById(Integer priceListId);
 
-    List<Price> getPricesByProductId (Integer productId);
+    List<PriceEntity> getPricesByProductId (Integer productId);
 
-    List<Price> findByBrandProductDate (Integer brandId, Integer productId, LocalDateTime date);
+    List<PriceEntity> findByBrandProductDate (Integer brandId, Integer productId, LocalDateTime date);
 
-    Price findFirstByBrandProductDate (Integer brandId, Integer productId, LocalDateTime date);
+    PriceEntity findFirstByBrandProductDate (Integer brandId, Integer productId, LocalDateTime date);
 }

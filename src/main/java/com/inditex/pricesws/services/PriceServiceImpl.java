@@ -59,23 +59,32 @@ public class PriceServiceImpl implements PriceService {
 
     @Override
     public List<PriceEntity> getPricesByProductId(Integer productId) {
-        return priceRepository.findAllByProductIdOrderByPriorityDesc(productId)
-                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND_BY_PRODUCT_ID + productId));
+        var priceList = priceRepository.findAllByProductIdOrderByPriorityDesc(productId);
+
+        if (priceList.isEmpty()){
+            throw new NoDataFoundException(PRICES_NOT_FOUND_BY_PRODUCT_ID + productId);
+        }
+
+        return priceList;
     }
 
     @Override
     public List<PriceEntity> findByBrandProductDate(Integer brandId, Integer productId, LocalDateTime date) {
-        return priceRepository.findByBrandProductAndDatePriorityDesc(brandId, productId, date)
-                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date));
+        var priceList = priceRepository.findByBrandProductAndDatePriorityDesc(brandId, productId, date);
+        if (priceList.isEmpty()){
+            throw new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date);
+        }
+
+        return priceList;
     }
 
     @Override
     public PriceEntity findFirstByBrandProductDate(Integer brandId, Integer productId, LocalDateTime date) {
-        var price = priceRepository.findByBrandProductAndDatePriorityDesc(brandId, productId, date)
-                .orElseThrow(() -> new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date));
+        var price = priceRepository.findByBrandProductAndDatePriorityDesc(brandId, productId, date);
         if (price.isEmpty()){
             throw new NoDataFoundException(PRICES_NOT_FOUND_BY_BRAND_PRODUCT_DATE +brandId +" "+productId+" "+date);
-    }
+        }
+
         return price.get(0);
     }
 }

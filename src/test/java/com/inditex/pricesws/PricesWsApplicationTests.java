@@ -142,25 +142,10 @@ class PricesWsApplicationTests {
 	}
 
 	@Test
-	void getPricesByProductIdNoExistTest(){
-		List<PriceEntity> prices = priceService.getPricesByProductId(35456);
-		assertNotNull(prices);
-		assertEquals(0, prices.size());
-	}
-
-	@Test
 	void findByBrandProductDateTest(){
 		LocalDateTime searchDate = LocalDateTime.parse("2020-06-14 10:00:00", formatter);
 		List<PriceEntity> prices = priceService.findByBrandProductDate(1, 35455, searchDate);
 		assertNotNull(prices);
 		assertEquals(1, prices.size());
-	}
-
-	@Test
-	void findByBrandProductDateNoExistTest(){
-		LocalDateTime searchDate = LocalDateTime.parse("2020-06-14 10:00:00", formatter);
-		List<PriceEntity> prices = priceService.findByBrandProductDate(0, 35456, searchDate);
-		assertNotNull(prices);
-		assertEquals(0, prices.size());
 	}
 }

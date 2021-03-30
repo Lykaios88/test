@@ -12,7 +12,7 @@ public interface PriceRepository extends JpaRepository <PriceEntity, Integer> {
 
     Optional<PriceEntity> findByPriceList(Integer priceListId);
     Optional<Integer> deleteByPriceList(Integer priceListId);
-    Optional<List<PriceEntity>> findAllByProductIdOrderByPriorityDesc(Integer productId);
+    List<PriceEntity> findAllByProductIdOrderByPriorityDesc(Integer productId);
 
     @Query("SELECT p FROM PriceEntity p " +
             "WHERE p.brandId = :brandId " +
@@ -20,5 +20,5 @@ public interface PriceRepository extends JpaRepository <PriceEntity, Integer> {
             "and p.startDate <= :date " +
             "and p.endDate >= :date " +
             "order by p.priority desc")
-    Optional<List<PriceEntity>>findByBrandProductAndDatePriorityDesc(Integer brandId, Integer productId, LocalDateTime date);
+    List<PriceEntity>findByBrandProductAndDatePriorityDesc(Integer brandId, Integer productId, LocalDateTime date);
 }

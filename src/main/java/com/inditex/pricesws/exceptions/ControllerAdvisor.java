@@ -52,7 +52,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException( NoDataFoundException ex, WebRequest request) {
+    public ResponseEntity<Object> globalHandlerException( Exception ex, WebRequest request) {
         if (loggerController.isDebugEnabled()) {
             loggerController.error(String.format("handleException request: %s error %S", request.toString(), ExceptionUtils.getStackTrace(ex)));
         }
